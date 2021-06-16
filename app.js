@@ -14,21 +14,23 @@ const main = async (ctx) => {
     ctx.response.status = 404;
     ctx.response.body = 'character or location or episode';
   } else {
-    // 直接请求将结果返回
-    await axios.get('https://rickandmortyapi.com/api' + ctx.request.url)
-      .then(res => ctx.response.body = res.data)
-      .catch(() => {
-        // 请求失败，返回空数据
-        const { id } = ctx.params
-        if (id && id.split(',').length === 1) {
-          ctx.response.body = {}
-        } else {
-          ctx.response.body = {
-            info: {},
-            results: []
-          }
+    try {
+      // 直接请求将结果返回
+      await axios.get('https://rickandmortyapi.com/api' + ctx.request.url)
+        .then(res => ctx.response.body = res.data)
+    }
+    catch {
+      // 返回空数据
+      const { id } = ctx.params
+      if (id && id.split(',').length === 1) {
+        ctx.response.body = {}
+      } else {
+        ctx.response.body = {
+          info: {},
+          results: []
         }
-      })
+      }
+    }
   }
 }
 
