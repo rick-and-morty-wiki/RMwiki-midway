@@ -10,13 +10,25 @@ const main = async (ctx) => {
   if (target !== 'character' &&
     target !== 'location' &&
     target !== 'episode') {
-      // 路由中没有character且location且episode，返回404
+    // 路由中没有character且location且episode，返回404
     ctx.response.status = 404;
     ctx.response.body = 'character or location or episode';
   } else {
     // 直接请求将结果返回
-    const res = await axios.get('https://rickandmortyapi.com/api' + ctx.request.url)
-    ctx.response.body = res.data
+    await axios.get('https://rickandmortyapi.com/api' + ctx.request.url)
+      .then(res => ctx.response.body = res.data)
+      .catch(() => {
+        // 请求失败，返回空数据
+        const { id } = ctx.params
+        if (id && id.split(',').length === 1) {
+          ctx.response.body = {}
+        } else {
+          ctx.response.body = {
+            info: {},
+            results: []
+          }
+        }
+      })
   }
 }
 
